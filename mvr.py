@@ -27,7 +27,8 @@ def construct_parser(parser):
     
     # Optional arguments
     parser.add_argument('-f', '--full',
-        type=int,
+        action='store_true',
+        default=False,
         help='Only rename files that the regex fully matches.')
 
 
@@ -39,7 +40,7 @@ def mvr(argv):
     new_files = []
     
     if args.full:
-        args.match_regex = re.sub('^{0}$'.format(args.match_regex))
+        args.match_regex = '^{0}$'.format(args.match_regex)
     
     for f in args.files:
         new_files.append(
