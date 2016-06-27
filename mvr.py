@@ -17,16 +17,8 @@
 
 import re
 import os
-from sys import argv
+import sys
 import argparse
-
-# counter = 0
-
-# def counter_format(x):
-#     # reverse?
-#     x.format(counter)
-#     counter += 1
-#     return x
 
 DESCRIPTION = 'A script to rename batches of files using regexes.'
 
@@ -54,20 +46,17 @@ def construct_parser(parser):
 
 parser = argparse.ArgumentParser(description=DESCRIPTION)
 construct_parser(parser)
-args = parser.parse_args(argv[1:])
+args = parser.parse_args(sys.argv[1:])
 
 new_files = []
 
+if args.full:
+    args.match_regex = re.sub('^{0}$'.format(args.match_regex))
+
 for f in args.files:
-    # Uncomment this for full-match mode (need to match entire string)
-    #new_files[i] = re.sub(  '^' + argv[-2] + '$',   # match pattern
     new_files.append(
         re.sub(args.match_regex, args.rename_regex, f)
     )
-
-#map(lambda x: counter_format(x), new_files)
-#new_files[:] = []
-
 
 # Check for collisions
 test_set = set(new_files)
@@ -78,7 +67,6 @@ if len(new_files) > len(test_set):
 # Rename the files
 # counter = 0
 for old, new in zip(args.files, new_files):
-    print('doit: {0} {1}'.format(old, new))
     if old == new:
         continue
     
