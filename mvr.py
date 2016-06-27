@@ -20,7 +20,9 @@ import os
 import sys
 import argparse
 
+
 DESCRIPTION = 'A script to rename batches of files using regexes.'
+
 
 # Command line arguments
 def construct_parser(parser):
@@ -44,34 +46,40 @@ def construct_parser(parser):
         help='Only rename files that the regex fully matches.')
 
 
-parser = argparse.ArgumentParser(description=DESCRIPTION)
-construct_parser(parser)
-args = parser.parse_args(sys.argv[1:])
-
-new_files = []
-
-if args.full:
-    args.match_regex = re.sub('^{0}$'.format(args.match_regex))
-
-for f in args.files:
-    new_files.append(
-        re.sub(args.match_regex, args.rename_regex, f)
-    )
-
-# Check for collisions
-test_set = set(new_files)
-if len(new_files) > len(test_set):
-    print('Collision exists in new file names. Aborting...')
-    exit(1)
-
-# Rename the files
-# counter = 0
-for old, new in zip(args.files, new_files):
-    if old == new:
-        continue
+def mvr(argv):
+    parser = argparse.ArgumentParser(description=DESCRIPTION)
+    construct_parser(parser)
+    args = parser.parse_args(sys.argv[1:])
     
-    # TODO: zfill with log(len(new_files)) or something
-    # new.format(counter) # counter feature
-    print('"{0}" => "{1}"'.format(old, new))
-    os.rename(old, new)
-    # counter += 1
+    new_files = []
+    
+    if args.full:
+        args.match_regex = re.sub('^{0}$'.format(args.match_regex))
+    
+    for f in args.files:
+        new_files.append(
+            re.sub(args.match_regex, args.rename_regex, f)
+        )
+    
+    
+    # Check for collisions
+    test_set = set(new_files)
+    if len(new_files) > len(test_set):
+        print('Collision exists in new file names. Aborting...')
+        exit(1)
+    
+    # Rename the files
+    # counter = 0
+    for old, new in zip(args.files, new_files):
+        if old == new:
+            continue
+        
+        # TODO: zfill with log(len(new_files)) or something
+        # new.format(counter) # counter feature
+        print('"{0}" => "{1}"'.format(old, new))
+        os.rename(old, new)
+        # counter += 1
+
+# Main method
+if __name__ == '__main__':
+    mvr(sys.argv[1:])
