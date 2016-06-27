@@ -18,40 +18,56 @@
 import re
 import os
 from sys import argv
-from glob import glob
+import argparse
 
 # counter = 0
 
 # def counter_format(x):
+#     # reverse?
 #     x.format(counter)
 #     counter += 1
 #     return x
 
+DESCRIPTION = 'A script to rename batches of files using regexes.'
 
-del argv[0]
+# Command line arguments
+def construct_parser(parser):
+    # Positional arguments
+    parser.add_argument('match_regex',
+        type=str,
+        help='The regex to use for matching files.')
+    
+    parser.add_argument('rename_regex',
+        type=str,
+        help='The regex to use for renaming files.')
+    
+    parser.add_argument('files',
+        type=str,
+        nargs='+',
+        help='The files to rename.')
+    
+    # Optional arguments
+    parser.add_argument('-f', '--full',
+        type=int,
+        help='Only rename files that the regex fully matches.')
 
-NUM_ARGS = 3
 
-if len(argv) < NUM_ARGS:
-    print('Insufficient number of arguments.')
-    exit(-1)
+parser = argparse.ArgumentParser(description=DESCRIPTION)
+construct_parser(parser)
+args = parser.parse_args(argv[1:])
 
-FULL_MATCH_MODE = '-f' in argv[3:]
-REVERSE_COUNTER = '-r' in argv[3:]
-
-files = glob(argv[0])
 new_files = []
 
-for f in files:
+for f in args.files:
     # Uncomment this for full-match mode (need to match entire string)
     #new_files[i] = re.sub(  '^' + argv[-2] + '$',   # match pattern
-    new_files.append(re.sub(argv[1],    # match pattern
-                            argv[2],    # replace pattern
-                            f))         # string
+    new_files.append(
+        re.sub(args.match_regex, args.rename_regex, f)
+    )
 
 #map(lambda x: counter_format(x), new_files)
-
 #new_files[:] = []
+
 
 # Check for collisions
 test_set = set(new_files)
@@ -61,7 +77,8 @@ if len(new_files) > len(test_set):
 
 # Rename the files
 # counter = 0
-for old, new in zip(files, new_files):
+for old, new in zip(args.files, new_files):
+    print('doit: {0} {1}'.format(old, new))
     if old == new:
         continue
     
