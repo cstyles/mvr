@@ -38,6 +38,14 @@ def construct_parser(parser):
         default=False,
         help='Only rename files that the regex fully matches.'
     )
+    
+    # Optional arguments
+    parser.add_argument(
+        '-n', '--dry-run',
+        action='store_true',
+        default=False,
+        help="Print changes but don't actually rename any files."
+    )
 
 
 def mvr(argv):
@@ -68,7 +76,8 @@ def mvr(argv):
             continue
         
         print('"{0}" => "{1}"'.format(old, new))
-        os.rename(old, new)
+        if not args.dry_run:
+            os.rename(old, new)
 
 # Main method
 if __name__ == '__main__':
