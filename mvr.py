@@ -12,24 +12,32 @@ DESCRIPTION = 'A script to rename batches of files using regexes.'
 # Command line arguments
 def construct_parser(parser):
     # Positional arguments
-    parser.add_argument('match_regex',
+    parser.add_argument(
+        'match_regex',
         type=str,
-        help='The regex to use for matching files.')
+        help='The regex to use for matching files.'
+    )
     
-    parser.add_argument('rename_regex',
+    parser.add_argument(
+        'rename_regex',
         type=str,
-        help='The regex to use for renaming files.')
+        help='The regex to use for renaming files.'
+    )
     
-    parser.add_argument('files',
+    parser.add_argument(
+        'files',
         type=str,
         nargs='+',
-        help='The files to rename.')
+        help='The files to rename.'
+    )
     
     # Optional arguments
-    parser.add_argument('-f', '--full',
+    parser.add_argument(
+        '-f', '--full',
         action='store_true',
         default=False,
-        help='Only rename files that the regex fully matches.')
+        help='Only rename files that the regex fully matches.'
+    )
 
 
 def mvr(argv):
