@@ -4,9 +4,10 @@ import re
 import os
 import sys
 import argparse
+import glob
 
 
-DESCRIPTION = 'A script to rename batches of files using regexes.'
+DESCRIPTION = 'A script to rename batches of files using regular expressions.'
 
 
 # Command line arguments
@@ -39,12 +40,18 @@ def construct_parser(parser):
         help='Only rename files that the regex fully matches.'
     )
     
-    # Optional arguments
     parser.add_argument(
         '-n', '--dry-run',
         action='store_true',
         default=False,
         help="Print changes but don't actually rename any files."
+    )
+    
+    parser.add_argument(
+        '-r', '--recursive',
+        action='store_true',
+        default=False,
+        help='Recursively search directories for files to rename.'
     )
 
 
@@ -58,6 +65,19 @@ def mvr(argv):
     if args.full:
         args.match_regex = '^{0}$'.format(args.match_regex)
     
+    # Recursively search directories
+    if args.recursive:
+        recursive_files = []
+        for f in args.files:
+            if os.path.isdir(f):
+                recursive_files += glob.glob(
+                    '{0}/**'.format(f),
+                    recursive=True
+                )
+        
+        # Add in recursively found files
+        args.files += recursive_files
+        
     for f in args.files:
         new_files.append(
             re.sub(args.match_regex, args.rename_regex, f)
@@ -65,6 +85,7 @@ def mvr(argv):
     
     
     # Check for collisions
+    # TODO: Add a verbose option that will print out the offending file(s)
     test_set = set(new_files)
     if len(new_files) > len(test_set):
         print('Collision exists in new file names. Aborting...')
