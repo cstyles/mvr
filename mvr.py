@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import re
 import os
@@ -7,7 +7,9 @@ import argparse
 import glob
 
 
+
 DESCRIPTION = 'A script to rename batches of files using regular expressions.'
+
 
 
 # Command line arguments
@@ -16,20 +18,20 @@ def construct_parser(parser):
     parser.add_argument(
         'match_regex',
         type=str,
-        help='The regex to use for matching files.'
+        help='The regex to use for matching files.',
     )
     
     parser.add_argument(
         'rename_regex',
         type=str,
-        help='The regex to use for renaming files.'
+        help='The regex to use for renaming files.',
     )
     
     parser.add_argument(
         'files',
         type=str,
         nargs='+',
-        help='The files to rename.'
+        help='The files to rename.',
     )
     
     # Optional arguments
@@ -37,22 +39,30 @@ def construct_parser(parser):
         '-f', '--full',
         action='store_true',
         default=False,
-        help='Only rename files that the regex fully matches.'
+        help='Only rename files that the regex fully matches.',
     )
     
     parser.add_argument(
         '-n', '--dry-run',
         action='store_true',
         default=False,
-        help="Print changes but don't actually rename any files."
+        help="Print changes but don't actually rename any files.",
     )
     
     parser.add_argument(
         '-r', '--recursive',
         action='store_true',
         default=False,
-        help='Recursively search directories for files to rename.'
+        help='Recursively search directories for files to rename.',
     )
+    
+    parser.add_argument(
+        '-v', '--verbose',
+        action='store_true',
+        default=False,
+        help='Verbose output',
+    )
+
 
 
 def mvr(argv):
@@ -63,7 +73,7 @@ def mvr(argv):
     new_files = []
     
     if args.full:
-        args.match_regex = '^{0}$'.format(args.match_regex)
+        args.match_regex = '^' + args.match_regex + '$'
     
     # Recursively search directories
     if args.recursive:
@@ -71,8 +81,8 @@ def mvr(argv):
         for f in args.files:
             if os.path.isdir(f):
                 recursive_files += glob.glob(
-                    '{0}/**'.format(f),
-                    recursive=True
+                    f'{f}/**',
+                    recursive=True,
                 )
         
         # Add in recursively found files
@@ -82,7 +92,6 @@ def mvr(argv):
         new_files.append(
             re.sub(args.match_regex, args.rename_regex, f)
         )
-    
     
     # Check for collisions
     # TODO: Add a verbose option that will print out the offending file(s)
@@ -96,9 +105,13 @@ def mvr(argv):
         if old == new:
             continue
         
-        print('"{0}" => "{1}"'.format(old, new))
+        if args.verbose:
+            print(f'"{old}" => "{new}"')
+        
         if not args.dry_run:
             os.rename(old, new)
+
+
 
 # Main method
 if __name__ == '__main__':
