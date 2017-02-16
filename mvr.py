@@ -39,7 +39,7 @@ def construct_parser(parser):
         '-f', '--full',
         action='store_true',
         default=False,
-        help='Only rename files that the regex fully matches.',
+        help='Only rename a file if its filepath is fully matched.',
     )
     
     parser.add_argument(
@@ -57,10 +57,17 @@ def construct_parser(parser):
     )
     
     parser.add_argument(
+        '-q', '--quiet',
+        action='store_true',
+        default=False,
+        help='Quiet mode.',
+    )
+    
+    parser.add_argument(
         '-v', '--verbose',
         action='store_true',
         default=False,
-        help='Verbose output',
+        help='Verbose output - NOT IMPLEMENTED',
     )
 
 
@@ -105,7 +112,7 @@ def mvr(argv):
         if old == new:
             continue
         
-        if args.verbose:
+        if not args.quiet:
             print(f'"{old}" => "{new}"')
         
         if not args.dry_run:
