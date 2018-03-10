@@ -43,6 +43,13 @@ def construct_parser(parser):
     )
     
     parser.add_argument(
+        '-i', '--prompt',
+        action='store_true',
+        default=False,
+        help='Prompt when trying to overwrite an existing file',
+    )
+
+    parser.add_argument(
         '-n', '--dry-run',
         action='store_true',
         default=False,
@@ -116,7 +123,14 @@ def mvr(argv):
             print(f'"{old}" => "{new}"')
         
         if not args.dry_run:
-            os.rename(old, new)
+            if args.prompt and os.path.exists(new):
+                resp = input(f'overwrite {new}? (y/n [n]) ')
+                if resp.lower() == 'y':
+                    os.rename(old, new)
+                else:
+                    print('not overwritten')
+            else:
+                os.rename(old, new)
 
 
 
