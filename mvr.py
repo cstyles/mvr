@@ -10,7 +10,7 @@ import glob
 DESCRIPTION = 'A script to rename batches of files using regular expressions.'
 
 
-def construct_parser(parser):
+def construct_parser():
     """Create an object for parsing command line arguments"""
     parser = argparse.ArgumentParser(description=DESCRIPTION)
 
@@ -81,6 +81,7 @@ def construct_parser(parser):
 
 
 def mvr(argv):
+    """Main method; Rename files using regular expressions"""
     parser = construct_parser()
     args = parser.parse_args(sys.argv[1:])
 
@@ -112,7 +113,7 @@ def mvr(argv):
     test_set = set(new_files)
     if len(new_files) > len(test_set):
         print('Collision exists in new file names. Aborting...')
-        exit(1)
+        return 1
 
     # Rename the files
     for old, new in zip(args.files, new_files):
@@ -132,8 +133,12 @@ def mvr(argv):
             else:
                 os.rename(old, new)
 
+    return 0
 
 
-# Main method
 if __name__ == '__main__':
-    mvr(sys.argv[1:])
+    try:
+        exit(mvr(sys.argv[1:]))
+    except KeyboardInterrupt as e:
+        print()
+        exit(130)
