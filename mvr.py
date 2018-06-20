@@ -92,21 +92,18 @@ def mvr(argv):
 
     # Recursively search directories
     if args.recursive:
-        recursive_files = []
-        for f in args.files:
-            if os.path.isdir(f):
-                recursive_files += glob.glob(
-                    f'{f}/**',
-                    recursive=True,
-                )
+        recursive_files = [
+            glob.glob(
+                f'{f}/**', recursive=True
+            ) for f in args.files if os.path.isdir(f)
+        ]
 
         # Add in recursively found files
         args.files += recursive_files
 
-    for f in args.files:
-        new_files.append(
-            re.sub(args.match_regex, args.rename_regex, f)
-        )
+    new_files = [
+        re.sub(args.match_regex, args.rename_regex, f) for f in args.files
+    ]
 
     # Check for collisions
     # TODO: Add a verbose option that will print out the offending file(s)
