@@ -84,25 +84,24 @@ def mvr(argv):
     """Main method; Rename files using regular expressions"""
     parser = construct_parser()
     args = parser.parse_args(sys.argv[1:])
-
-    new_files = []
+    files = []
 
     if args.full:
         args.match_regex = '^' + args.match_regex + '$'
 
     # Recursively search directories
     if args.recursive:
-        recursive_files = [
-            glob.glob(
-                f'{f}/**', recursive=True
-            ) for f in args.files if os.path.isdir(f)
-        ]
-
-        # Add in recursively found files
-        args.files += recursive_files
+        for f in args.files:
+            if os.path.isdir(f):
+                recursive_files = glob.glob(f'{f}/**', recursive=True)
+                files.extend(recursive_files)
+            else:
+                files.append(f)
+    else:
+        files = args.files
 
     new_files = [
-        re.sub(args.match_regex, args.rename_regex, f) for f in args.files
+        re.sub(args.match_regex, args.rename_regex, f) for f in files
     ]
 
     # Check for collisions
@@ -113,7 +112,7 @@ def mvr(argv):
         return 1
 
     # Rename the files
-    for old, new in zip(args.files, new_files):
+    for old, new in zip(files, new_files):
         if old == new:
             continue
 
